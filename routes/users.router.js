@@ -3,7 +3,10 @@ var router = express.Router();
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  res.json({
+    status: 200,
+    message : 'Welcome to the API from Germán Ruiz USERS'
+  });
 });
 
 module.exports = router;
