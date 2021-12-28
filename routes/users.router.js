@@ -1,12 +1,23 @@
 var express = require('express');
 var router = express.Router();
+const User = require('../model/users.model');
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.json({
-    status: 200,
-    message : 'Welcome to the API from Germán Ruiz USERS'
-  });
+router.get('/', async function(req, res, next) {
+  let results = [];
+  try {
+    results = await User.find({}, 'username password');
+  } catch (error) {
+    
+  }
+
+  res.json(results);
+});
+
+
+/** POST a new user */
+router.post('/', async function(req, res, next) {
+
 });
 
 module.exports = router;

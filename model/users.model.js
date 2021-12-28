@@ -2,8 +2,10 @@ require('dotenv').config();
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const jwb = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const { ACCESS_TOKEN_SECRET, REQUEST_TOKEN_SECRET } = process.env;
+
+const Token = require('./token.model');
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -46,12 +48,42 @@ UserSchema.methods.usernameExists = async (username) => {
 }
 
 UserSchema.methods.isCorrectPassword = async (password, hash) => {
-
   try {
     const same = await bcrypt.compare(password, hash);
     return same;
   } catch (error) {
-    return false;
+    return false; 
   }
   
 }
+
+UserSchema.methods.createAccessToken =  () => {
+  const {id, username } = this;
+
+  const accessToken = jwt.sign(
+    { user: {id, username}},
+    ACCESS_TOKEN_SECRET,
+    {expiresIn: '1d'}
+  );
+
+  return accessToken;
+}
+
+UserSchema.methods.createRefreshToken = async () => {
+  const { id, username } = this;
+  const refreshToken = jwt.sign(
+    { user: { id, username } },
+    REQUEST_TOKEN_SECRET,
+    { expiresIn: '20d' }
+  );
+
+  try {
+    await new Token({token: refreshToken}).save();
+
+    return refreshToken;
+  } catch (error) {
+    next(new Error('Error crating refresh token'));
+  }
+}
+
+module.exports = mongoose.model('User', UserSchema);
