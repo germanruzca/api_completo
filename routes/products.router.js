@@ -3,9 +3,11 @@ const createError = require('http-errors');
 var router = express.Router();
 const {jsonResponse} = require('../lib/jsonresponse');
 
+const auth = require('../auth/auth.middleware');
+
 const Product = require('../model/products.model');
 
-router.get('/', async (req, res, next) => {
+router.get('/', auth.checkAuth, async (req, res, next) => {
   let results = {};
   
   try {
@@ -18,7 +20,7 @@ router.get('/', async (req, res, next) => {
   res.json(jsonResponse(200, {results: results}));
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', auth.checkAuth,async (req, res, next) => {
   const { title, price } = req.body;
 
   if(!title || !price) {
@@ -38,7 +40,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.get('/:idproduct', async (req, res, next) => {
+router.get('/:idproduct', auth.checkAuth,async (req, res, next) => {
   let results = {};
 
   const { idproduct } = req.params;
@@ -54,7 +56,7 @@ router.get('/:idproduct', async (req, res, next) => {
   res.json(jsonResponse(200, {results}));
 });
 
-router.patch('/:idproduct', async (req, res, next) => {
+router.patch('/:idproduct',auth.checkAuth, async (req, res, next) => {
   let update = {};
 
   const  {idproduct} = req.params;
@@ -76,7 +78,7 @@ router.patch('/:idproduct', async (req, res, next) => {
   res.json(jsonResponse(200, {message: `Product ${idproduct} updated successfully`}));
 });
 
-router.delete('/:idproduct', async (req, res, next) => {
+router.delete('/:idproduct', auth.checkAuth,async (req, res, next) => {
 
   const { idproduct } = req.params;
 

@@ -3,10 +3,12 @@ const createError = require('http-errors');
 var router = express.Router();
 const {jsonResponse} = require('../lib/jsonresponse');
 
+const auth = require('../auth/auth.middleware');
+
 const User = require('../model/users.model');
 
 /* GET users listing. */
-router.get('/', async function(req, res, next) {
+router.get('/', auth.checkAuth,async function(req, res, next) {
   let results = [];
   try {
     results = await User.find({}, 'username password');
@@ -19,7 +21,7 @@ router.get('/', async function(req, res, next) {
 
 
 /** POST a new user */
-router.post('/', async function(req, res, next) {
+router.post('/',auth.checkAuth, async function(req, res, next) {
   const { username, password } = req.body;
 
   if (!username || !password) {

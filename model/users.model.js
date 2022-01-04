@@ -3,7 +3,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { ACCESS_TOKEN_SECRET, REQUEST_TOKEN_SECRET } = process.env;
+const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
 
 const Token = require('./token.model');
 
@@ -39,7 +39,7 @@ UserSchema.pre('save', function (next) {
 });
 
 UserSchema.methods.usernameExists = async (username) => {
-
+  console.log('username Exists')
   try {
     let result = await mongoose.model('User').find({username: username});
     return result.length > 0;
@@ -50,6 +50,7 @@ UserSchema.methods.usernameExists = async (username) => {
 }
 
 UserSchema.methods.isCorrectPassword = async (password, hash) => {
+  console.log('Si son iguales :D')
   try {
     const same = await bcrypt.compare(password, hash);
     return same;
@@ -75,8 +76,8 @@ UserSchema.methods.createRefreshToken = async () => {
   const { id, username } = this;
   const refreshToken = jwt.sign(
     { user: { id, username } },
-    REQUEST_TOKEN_SECRET,
-    { expiresIn: '20d' }
+    REFRESH_TOKEN_SECRET,
+    { expiresIn: '1d' }
   );
 
   try {

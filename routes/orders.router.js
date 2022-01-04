@@ -3,9 +3,12 @@ const createError = require('http-errors');
 var router = express.Router();
 const {jsonResponse} = require('../lib/jsonresponse');
 
+const auth = require('../auth/auth.middleware');
+
+
 const Order = require('../model/orders.model');
 
-router.get('/', async (req, res, next) => {
+router.get('/',auth.checkAuth, async (req, res, next) => {
   let results ={};
   try {
     results = await Order.find({}, 'iduser total date products');
@@ -16,7 +19,7 @@ router.get('/', async (req, res, next) => {
   res.json(jsonResponse(200, {body: results}));
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/',auth.checkAuth, async (req, res, next) => {
   const {iduser, products } = req.body;
 
   if(!iduser || !products) {
